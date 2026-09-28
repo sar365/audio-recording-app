@@ -1,0 +1,11 @@
+{
+  "title": "DJ companion",
+  "description": "Capture shared tab or system audio and audio inputs in your browser, then download recordings as WebM/Opus files.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
