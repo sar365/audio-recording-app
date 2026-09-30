@@ -86,7 +86,7 @@ export default function SessionLog({ sessions, onDelete }: SessionLogProps) {
       </div>
 
       <div className="px-4 py-2.5 font-mono text-[9px] tracking-widest" style={{ color: "var(--muted-foreground)", borderTop: "1px solid var(--border)" }}>
-        Downloads are saved by your browser to its configured download folder.
+        Choose a save location in the operating system's Save dialog.
       </div>
     </div>
   );

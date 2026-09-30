@@ -94,7 +94,7 @@ export default function RecordingControls({
       </div>
 
       <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
-        Browser preview captures shared tab/system audio or an audio input and saves WebM/Opus. Lossless WASAPI/ASIO capture requires the native Windows engine.
+        Record a selected desktop audio source or input as WebM/Opus. Screen video is not saved; native lossless WASAPI/ASIO is not included.
       </p>
     </div>
   );

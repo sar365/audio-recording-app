@@ -39,7 +39,7 @@ function formatSize(bytes: number) {
 function getErrorMessage(error: unknown) {
   if (error instanceof DOMException) {
     if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
-      return "Audio capture was cancelled or denied. Allow capture in your browser and try again.";
+      return "Audio capture was cancelled or denied. Check microphone or screen-audio permissions and try again.";
     }
     if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
       return "No usable audio input was found. Connect an audio device and try again.";
@@ -47,9 +47,9 @@ function getErrorMessage(error: unknown) {
     if (error.name === "NotReadableError") {
       return "The selected audio source is busy or unavailable. Close other apps using it and retry.";
     }
-    return error.message || "The browser could not start audio capture.";
+    return error.message || "The desktop app could not start audio capture.";
   }
-  return error instanceof Error ? error.message : "The browser could not start audio capture.";
+  return error instanceof Error ? error.message : "The desktop app could not start audio capture.";
 }
 
 export default function Index() {
@@ -60,7 +60,7 @@ export default function Index() {
   const [captureMode, setCaptureMode] = useState<CaptureMode>("wasapi");
   const [isStarting, setIsStarting] = useState(false);
   const [recordingSizeBytes, setRecordingSizeBytes] = useState(0);
-  const [outputFormat, setOutputFormat] = useState("WebM / Opus · browser capture");
+  const [outputFormat, setOutputFormat] = useState("WebM / Opus · desktop capture");
   const [sessions, setSessions] = useState<RecordedSession[]>([]);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
@@ -90,12 +90,12 @@ export default function Index() {
 
   async function getAudioCaptureStream() {
     if (!navigator.mediaDevices) {
-      throw new Error("Audio capture requires a secure browser context (HTTPS or localhost). ");
+      throw new Error("Audio capture is unavailable. Check the app's system audio permissions and try again.");
     }
 
     if (captureMode === "wasapi") {
       if (!navigator.mediaDevices.getDisplayMedia) {
-        throw new Error("This browser cannot share system or tab audio. Try a current version of Chrome or Edge.");
+        throw new Error("Desktop audio capture is unavailable on this system. Choose an audio-input mode instead.");
       }
       const sharedStream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
@@ -103,9 +103,9 @@ export default function Index() {
       });
       if (sharedStream.getAudioTracks().length === 0) {
         sharedStream.getTracks().forEach((track) => track.stop());
-        throw new Error("No shared audio was received. In the browser share dialog, choose a tab or screen and enable its audio option.");
+        throw new Error("The selected source provided no audio. Try a different screen or window, or use an audio-input mode.");
       }
-      setNotice("Capturing audio from the tab or screen you selected in the browser share dialog.");
+      setNotice("Capturing audio from the screen or window selected in the system picker. Video is not saved.");
       return sharedStream;
     }
 
@@ -127,12 +127,12 @@ export default function Index() {
         audio: { deviceId: { exact: matchedInput.deviceId } },
         video: false,
       });
-      setNotice(`Capturing from ${matchedInput.label}. Browser recordings are WebM/Opus, not lossless WASAPI/ASIO files.`);
+      setNotice(`Capturing from ${matchedInput.label}. Recordings are WebM/Opus, not lossless WASAPI/ASIO files.`);
       return selectedStream;
     }
 
-    const actualLabel = defaultStream.getAudioTracks()[0]?.label || "the browser's default microphone input";
-    setNotice(`Capturing from ${actualLabel}. The selected ASIO/DJ preset is not connected to a native engine in this browser preview.`);
+    const actualLabel = defaultStream.getAudioTracks()[0]?.label || "the system's default audio input";
+    setNotice(`Capturing from ${actualLabel}. The selected ASIO/DJ preset is not connected to a native engine in this app.`);
     return defaultStream;
   }
 
@@ -142,7 +142,7 @@ export default function Index() {
     setIsStarting(true);
     setError("");
     setNotice(captureMode === "wasapi"
-      ? "Choose a tab or screen in the browser dialog and enable audio sharing."
+      ? "Choose a screen or window in the system picker. Only its audio will be recorded."
       : "Requesting access to an audio input…");
 
     let stream: MediaStream | null = null;
@@ -159,7 +159,7 @@ export default function Index() {
       pausedDurationRef.current = 0;
       captureStreamRef.current = stream;
       mediaRecorderRef.current = recorder;
-      setOutputFormat(`${recorder.mimeType || "Browser audio"} · browser capture`);
+      setOutputFormat(`${recorder.mimeType || "Audio"} · desktop capture`);
 
       recorder.addEventListener("dataavailable", (event) => {
         if (event.data.size > 0) {
@@ -200,8 +200,8 @@ export default function Index() {
           downloadUrl,
         };
         setSessions((current) => [finishedSession, ...current]);
-        setOutputFormat(`${actualMimeType} · browser capture`);
-        setNotice(`Recording ready: ${filename}. Use Download in Recorded Sessions if your browser did not download it automatically.`);
+        setOutputFormat(`${actualMimeType} · desktop capture`);
+        setNotice(`Recording ready: ${filename}. Use Download in Recorded Sessions to save another copy or if you cancelled the save dialog.`);
         setError("");
 
         // Attempt a direct download at stop; the session table retains a second download link.
@@ -215,7 +215,7 @@ export default function Index() {
         chunksRef.current = [];
       });
       recorder.addEventListener("error", () => {
-        setError("The browser encountered an error while recording. Stop and try another audio source.");
+        setError("The desktop recorder encountered an error. Stop and try another audio source.");
       });
 
       const audioTrack = stream.getAudioTracks()[0];

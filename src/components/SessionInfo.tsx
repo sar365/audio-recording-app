@@ -70,7 +70,7 @@ export default function SessionInfo({ state, sampleRate, bitDepth, fileSizeBytes
         {outputFormat}
       </div>
       <p className="text-[9px] leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
-        Browser encoding is managed by the browser; target rate/depth settings apply only to the native engine.
+        Audio encoding is managed by Electron's MediaRecorder; target rate/depth settings are not applied by this build.
       </p>
     </div>
   );
