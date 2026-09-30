@@ -15,10 +15,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "desktop:build": "vite build --mode desktop --base=./ && electron-builder",
-    "desktop:linux": "vite build --mode desktop --base=./ && electron-builder --linux",
-    "desktop:win": "vite build --mode desktop --base=./ && electron-builder --win",
-    "desktop:mac": "vite build --mode desktop --base=./ && electron-builder --mac",
+    "desktop:build": "vite build --mode desktop --base=./ && electron-builder --publish never",
+    "desktop:linux": "vite build --mode desktop --base=./ && electron-builder --linux --publish never",
+    "desktop:win": "vite build --mode desktop --base=./ && electron-builder --win --publish never",
+    "desktop:mac": "vite build --mode desktop --base=./ && electron-builder --mac --publish never",
     "format": "oxfmt"
   },
   "dependencies": {
